@@ -14,5 +14,4 @@ public class Driver extends Application
         primaryStage.setTitle("Chess Board");
         primaryStage.show();
     }
-
 }
