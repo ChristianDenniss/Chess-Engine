@@ -1,42 +1,91 @@
+import java.util.List;
+import java.util.ArrayList;
+
+
 public class Queen extends Piece
 {
-    public Queen(boolean isWhite) 
+   
+    public Queen(boolean isWhite)
     {
         super(isWhite);
+        this.value = 9;
     }
 
     @Override
-    public boolean isValidMove(int startX, int startY, int endX, int endY, ChessBoard board)
+    public List<int[]> getValidMoves(int startX, int startY, ChessBoard board)
     {
-        int dx = Math.abs(endX - startX);
-        int dy = Math.abs(endY - startY);
-
-        // The Queen can move horizontally, vertically, or diagonally
-        // 1. Horizontal or vertical movement (dx == 0 or dy == 0)
-        if (dx == 0 || dy == 0)
+        List<int[]> validMoves = new ArrayList<>();
+    
+        // Directions for Queen: horizontal, vertical, and diagonal
+        int[][] directions = {
+            {-1, 0}, // Up
+            {1, 0},  // Down
+            {0, -1}, // Left
+            {0, 1},  // Right
+            {-1, -1}, // Diagonal up-left
+            {-1, 1},  // Diagonal up-right
+            {1, -1},  // Diagonal down-left
+            {1, 1}    // Diagonal down-right
+        };
+    
+        // Loop through each direction
+        for (int[] direction : directions)
         {
-            return isPathClear(startX, startY, endX, endY, board);
+            int x = startX;
+            int y = startY;
+    
+            // Move in the current direction
+            while (true)
+            {
+                x += direction[0];
+                y += direction[1];
+    
+                // Check if the move is within bounds
+                if (x < 0 || x >= 8 || y < 0 || y >= 8)
+                {
+                    break; // Stop if out of bounds
+                }
+    
+                // If the square is empty, add it as a valid move
+                if (board.getBoard()[x][y] == null)
+                {
+                    validMoves.add(new int[]{x, y});
+                }
+                else
+                {
+                    // If the square contains an opponent's piece, add it as a capture move
+                    if (board.getBoard()[x][y].isWhite() != isWhite())
+                    {
+                        validMoves.add(new int[]{x, y});
+                    }
+                    break; // Stop if there's a piece, whether it is friendly or not
+                }
+            }
         }
-        // 2. Diagonal movement (dx == dy)
-        else if (dx == dy)
-        {
-            return isPathClear(startX, startY, endX, endY, board);
-        }
-
-        return false;  // Invalid move if neither horizontal, vertical, nor diagonal
+    
+        return validMoves;
     }
 
     @Override
     public boolean move(int startX, int startY, int endX, int endY, ChessBoard board)
     {
-        if (isValidMove(startX, startY, endX, endY, board))
+        // Get the list of valid moves for the Queen
+        List<int[]> validMoves = getValidMoves(startX, startY, board);
+    
+        // Check if the end position is in the list of valid moves
+        for (int[] validMove : validMoves)
         {
-            // Move the Queen piece to the new position
-            board.getBoard()[endX][endY] = this;
-            board.getBoard()[startX][startY] = null;
-            return true;
+            if (validMove[0] == endX && validMove[1] == endY)
+            {
+                // Move is valid, update the board
+                board.getBoard()[endX][endY] = this;
+                board.getBoard()[startX][startY] = null;
+                return true;
+            }
         }
-        return false;  // Return false if the move is invalid
+    
+        // If no valid move found, return false
+        return false;
     }
 
     @Override
@@ -49,34 +98,5 @@ public class Queen extends Piece
     public String getImageFileName()
     {
         return (isWhite() ? "white" : "black") + "queen.png";  // File name for Queen images
-    }
-
-    // Helper method to check if the path is clear (no pieces in the way)
-    private boolean isPathClear(int startX, int startY, int endX, int endY, ChessBoard board)
-    {
-        int xDirection = Integer.signum(endX - startX);
-        int yDirection = Integer.signum(endY - startY);
-
-        int x = startX + xDirection;
-        int y = startY + yDirection;
-
-        // Check if there are pieces in the path
-        while (x != endX || y != endY)
-        {
-            if (board.getBoard()[x][y] != null)  // If there is a piece in the way
-            {
-                return false;
-            }
-            x += xDirection;
-            y += yDirection;
-        }
-        // Ensure the destination square is not occupied by a piece of the same color
-        Piece targetPiece = board.getBoard()[endX][endY];
-        if (targetPiece != null && targetPiece.isWhite() == this.isWhite())
-        {
-            return false;  // Can't capture a piece of the same color
-        }
-
-        return true;  // Path is clear and move is valid
     }
 }
