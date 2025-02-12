@@ -1,42 +1,62 @@
+import java.util.List;
+import java.util.ArrayList;
+
 public class Knight extends Piece
 {
-    public Knight(boolean isWhite) 
+    public Knight(boolean isWhite)
     {
         super(isWhite);
+        this.value = 3;  // Knights are typically valued at 3 points
     }
 
     @Override
-    public boolean isValidMove(int startX, int startY, int endX, int endY, ChessBoard board)
+    public List<int[]> getValidMoves(int startX, int startY, ChessBoard board)
     {
-        // Check if the move is in the L-shaped pattern: 2 squares in one direction, 1 square in a perpendicular direction.
-        int dx = Math.abs(endX - startX);
-        int dy = Math.abs(endY - startY);
+        List<int[]> validMoves = new ArrayList<>();
 
-        // Knight's valid move: either 2 squares in one direction and 1 in the other
-        if ((dx == 2 && dy == 1) || (dx == 1 && dy == 2))
+        // Possible move offsets for a knight (L-shaped moves)
+        int[][] knightMoves = {
+            {-2, -1}, {-2, 1}, {2, -1}, {2, 1},  // Moves 2 squares in one direction, 1 square in perpendicular direction
+            {-1, -2}, {-1, 2}, {1, -2}, {1, 2}   // Moves 1 square in one direction, 2 squares in perpendicular direction
+        };
+
+        // Loop through each possible knight move
+        for (int[] move : knightMoves)
         {
-            // Check if the destination square is occupied by a piece of the same color
-            Piece targetPiece = board.getBoard()[endX][endY];
-            if (targetPiece != null && targetPiece.isWhite() == this.isWhite()) 
+            int newX = startX + move[0];
+            int newY = startY + move[1];
+
+            // Check if the move is within bounds
+            if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8)
             {
-                return false;  // Cannot capture a piece of the same color
+                // If the square is empty or occupied by an opponent's piece, add it as a valid move
+                if (board.getBoard()[newX][newY] == null || board.getBoard()[newX][newY].isWhite() != isWhite())
+                {
+                    validMoves.add(new int[]{newX, newY});
+                }
             }
-            return true;  // Valid L-shaped move
         }
-        return false;  // Invalid move if not in L-shape
+
+        return validMoves;
     }
 
     @Override
     public boolean move(int startX, int startY, int endX, int endY, ChessBoard board)
     {
-        if (isValidMove(startX, startY, endX, endY, board))
+        // Check if the move is valid by comparing the end position with valid moves
+        List<int[]> validMoves = getValidMoves(startX, startY, board);
+        for (int[] validMove : validMoves)
         {
-            // Move the Knight piece to the new position
-            board.getBoard()[endX][endY] = this;
-            board.getBoard()[startX][startY] = null;
-            return true;
+            if (validMove[0] == endX && validMove[1] == endY)
+            {
+                // Make the move
+                board.getBoard()[endX][endY] = this;
+                board.getBoard()[startX][startY] = null;
+                return true;  // Move was successfully made
+            }
         }
-        return false;  // Return false if the move is invalid
+
+        return false;  // Invalid move
     }
 
     @Override
@@ -44,7 +64,7 @@ public class Knight extends Piece
     {
         return isWhite() ? "N" : "n";  // White Knight is 'N', Black Knight is 'n'
     }
-    
+
     @Override
     public String getImageFileName()
     {
