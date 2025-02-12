@@ -1,10 +1,14 @@
+import java.util.List;
+
 public class ChessBoard
 {
     private Piece[][] board;
+    private ChessBoardUI chessBoardUI;
 
     public ChessBoard()
     {
         this.board = new Piece[8][8];
+        this.chessBoardUI = chessBoardUI;
         setupBoard();
     }
 
@@ -77,12 +81,25 @@ public class ChessBoard
     public boolean movePiece(int startX, int startY, int endX, int endY)
     {
         Piece piece = board[startX][startY];
-        if (piece != null && piece.isValidMove(startX, startY, endX, endY, this))
+        
+        if (piece != null)
         {
-            board[endX][endY] = piece;
-            board[startX][startY] = null;
-            return true;
+            // Get the list of valid moves for the piece
+            List<int[]> validMoves = piece.getValidMoves(startX, startY, this);
+            
+            // Check if the destination is in the list of valid moves
+            for (int[] validMove : validMoves)
+            {
+                if (validMove[0] == endX && validMove[1] == endY)
+                {
+                    // Move the piece
+                    board[endX][endY] = piece;
+                    board[startX][startY] = null;
+                    return true; // Successful move
+                }
+            }
         }
-        return false;
+        
+        return false; // Invalid move
     }
 }
