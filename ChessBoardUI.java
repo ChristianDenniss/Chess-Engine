@@ -45,7 +45,7 @@ public class ChessBoardUI
     }
 
     // Method to set up the board with pieces and tiles
-    private void setupBoard()
+    public void setupBoard()
     {
         for (int row = 0; row < 8; row++)
         {
@@ -86,134 +86,144 @@ public class ChessBoardUI
             }
         }
     }
+    
+    public void promotePawn(int x, int y)
+    {
+        Piece piece = this.chessBoard.getBoard()[x][y];
 
+        if (piece instanceof Pawn)
+        {
+            boolean isWhite = piece.isWhite();
+            this.chessBoard.getBoard()[x][y] = new Queen(isWhite); // Replace pawn with queen
+            
+            System.out.println("Pawn promoted to Queen!");
+            refreshBoardUI();
+        }
+    }
+
+    
     private void handleSquareClick(int row, int col)
     {
-        // Debugging: Log the clicked square
         System.out.println("Square clicked: Row = " + row + ", Column = " + col);
-    
-        // Reset the colors of all tiles first
         resetTileColors();
     
-        // Get the piece at the clicked position
         Piece piece = board[row][col];
         System.out.println("Piece at clicked square: " + (piece != null ? piece.toString() : "None"));
     
-        // If there's a piece on the square, handle it
         if (piece != null)
         {
-            // If a piece is already selected
             if (selectedPiece != null)
             {
-                // If you clicked the same piece, deselect it
                 if (selectedPiece == piece)
                 {
                     System.out.println("Deselected the piece: " + selectedPiece.toString());
                     selectedPiece = null;
-                    resetTileColors();  // Reset tile colors after deselecting
+                    resetTileColors();
                 }
-                // If the clicked piece is of the same color, switch to the new piece
                 else if (selectedPiece.isWhite() == piece.isWhite())
                 {
                     System.out.println("Switched to a new piece: " + piece.toString());
-                    selectedPiece = piece;  // Switch to the newly clicked piece
+                    selectedPiece = piece;
                     selectedPieceX = row;
                     selectedPieceY = col;
-                    clearLegalMoveHighlights();  // Clear the old legal move highlights
-                    highlightLegalMoves(piece, row, col);  // Highlight the legal moves of the new piece
+                    clearLegalMoveHighlights();
+                    highlightLegalMoves(piece, row, col);
                 }
-                // If the clicked piece is of the opposite color, capture the opponent's piece
                 else
                 {
                     System.out.println("Captured opponent's piece: " + piece.toString());
-                    // Move the selected piece to the target square (capture the opponent's piece)
                     if (selectedPiece.move(selectedPieceX, selectedPieceY, row, col, chessBoard))
                     {
                         board[row][col] = selectedPiece;
-                        board[selectedPieceX][selectedPieceY] = null;  // Clear the original square
+                        board[selectedPieceX][selectedPieceY] = null;
     
-                        // Update the UI after the move
+                        // Check if a pawn should be promoted
+                        if (selectedPiece instanceof Pawn && ((row == 0 && !selectedPiece.isWhite()) || (row == 7 && selectedPiece.isWhite())))
+                        {
+                            promotePawn(row, col);
+                        }
+    
                         refreshBoardUI();
-    
-                        // Deselect the piece after capturing
+                        SoundHandler.playCaptureSound();
                         selectedPiece = null;
-                        resetTileColors();  // Reset all tile colors after the move
+                        resetTileColors();
                     }
                     else
                     {
                         System.out.println("Invalid move.");
-                        selectedPiece = null;  // Reset selection if the move is invalid
-                        resetTileColors();  // Reset tile colors
-                        clearLegalMoveHighlights();  // Clear the old legal move highlights
+                        SoundHandler.playErrorSound();
+                        selectedPiece = null;
+                        resetTileColors();
+                        clearLegalMoveHighlights();
                     }
                 }
             }
             else
             {
-                // No piece selected, select the new piece and highlight it
                 selectedPiece = piece;
                 selectedPieceX = row;
                 selectedPieceY = col;
-                highlightSelectedTile(row, col);  // Highlight the newly selected tile
-                highlightLegalMoves(piece, row, col);  // Highlight the legal moves of the selected piece
+                highlightSelectedTile(row, col);
+                highlightLegalMoves(piece, row, col);
             }
         }
         else
         {
-            // If the square is empty and a piece is selected, move the selected piece
             if (selectedPiece != null)
             {
-                System.out.println("Moving piece to square.");
-    
-                // Get the piece at the target square (where we want to move)
+                System.out.println("Moving piece to square...");
                 Piece targetPiece = board[row][col];
     
-                // If the target square is empty or has an opponent's piece, proceed
                 if (targetPiece == null || (targetPiece != null && targetPiece.isWhite() != selectedPiece.isWhite()))
                 {
                     if (selectedPiece.move(selectedPieceX, selectedPieceY, row, col, chessBoard))
                     {
-                        // Move the selected piece to the target square
-                        board[row][col] = selectedPiece;  // Place the selected piece on the target square
-                        board[selectedPieceX][selectedPieceY] = null;  // Clear the original square
+                        board[row][col] = selectedPiece;
+                        board[selectedPieceX][selectedPieceY] = null;
     
-                        // If there's an opponent's piece on the target square, remove it (capture)
                         if (targetPiece != null)
                         {
                             System.out.println("Captured opponent's piece: " + targetPiece.toString());
                         }
     
-                        // Update the UI after the move
-                        refreshBoardUI();
+                        // **Check if the moved piece is a pawn and has reached promotion rank**
+                        if (selectedPiece instanceof Pawn && ((row == 0 && !selectedPiece.isWhite()) || (row == 7 && selectedPiece.isWhite())))
+                        {
+                            promotePawn(row, col);
+                        }
     
-                        // Deselect the piece after moving
+                        refreshBoardUI();
+                        SoundHandler.playMoveSound();
                         selectedPiece = null;
-                        resetTileColors();  // Reset all tile colors after the move
-                        clearLegalMoveHighlights();  // Clear the legal move highlights
+                        resetTileColors();
+                        clearLegalMoveHighlights();
                     }
                     else
                     {
                         System.out.println("Invalid move.");
-                        selectedPiece = null;  // Reset selection if the move is invalid
-                        resetTileColors();  // Reset tile colors
-                        clearLegalMoveHighlights();  // Clear the old legal move highlights
+                        SoundHandler.playErrorSound();
+                        selectedPiece = null;
+                        resetTileColors();
+                        clearLegalMoveHighlights();
                     }
                 }
                 else
                 {
                     System.out.println("Invalid move, target square occupied by friendly piece.");
-                    selectedPiece = null;  // Reset selection if the move is invalid
-                    resetTileColors();  // Reset tile colors
-                    clearLegalMoveHighlights();  // Clear the old legal move highlights
+                    SoundHandler.playErrorSound();
+                    selectedPiece = null;
+                    resetTileColors();
+                    clearLegalMoveHighlights();
                 }
             }
             else
             {
-                // If the square is empty and no piece is selected, do nothing
                 System.out.println("No piece selected and square is empty.");
             }
         }
     }
+
+
 
 
     // Method to highlight the legal moves of the selected piece
