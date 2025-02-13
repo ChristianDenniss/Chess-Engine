@@ -58,10 +58,10 @@ public class King extends Piece
                 // Make the move
                 board.getBoard()[endX][endY] = this;
                 board.getBoard()[startX][startY] = null;
+                
                 return true;
             }
         }
-
         return false;  // Invalid move
     }
 
