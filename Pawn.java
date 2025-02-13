@@ -17,28 +17,43 @@ public class Pawn extends Piece
     public List<int[]> getValidMoves(int row, int col, ChessBoard chessBoard) 
     {
         List<int[]> validMoves = new ArrayList<>();
+        
+        // Determine direction based on pawn color
+        int direction = isWhite() ? 1 : -1;  // White moves down (+1), Black moves up (-1)
     
         // Normal one-step move forward
-        if (row + 1 < 8 && chessBoard.getBoard()[row + 1][col] == null) 
+        if (row + direction >= 0 && row + direction < 8 && chessBoard.getBoard()[row + direction][col] == null) 
         {
-            validMoves.add(new int[] { row + 1, col });
+            validMoves.add(new int[] { row + direction, col });
         }
     
-        // Initial two-step move forward
-        if (row == 1 && chessBoard.getBoard()[row + 2][col] == null && chessBoard.getBoard()[row + 1][col] == null) 
+        // Initial two-step move forward (only for first move)
+        if (isFirstMove) 
         {
-            validMoves.add(new int[] { row + 2, col });
+            int initialRow = isWhite() ? 1 : 6;
+            if (row == initialRow 
+                && chessBoard.getBoard()[row + 2 * direction][col] == null 
+                && chessBoard.getBoard()[row + direction][col] == null) 
+            {
+                validMoves.add(new int[] { row + 2 * direction, col });
+            }
         }
     
         // Diagonal capture moves (only for opponent pieces)
-        if (row + 1 < 8) {
-            if (col - 1 >= 0 && chessBoard.getBoard()[row + 1][col - 1] != null && !chessBoard.getBoard()[row + 1][col - 1].isWhite()) 
+        if (row + direction >= 0 && row + direction < 8) 
+        {
+            // Left diagonal capture (only if there is an opponent's piece)
+            if (col - 1 >= 0 && chessBoard.getBoard()[row + direction][col - 1] != null 
+                && chessBoard.getBoard()[row + direction][col - 1].isWhite() != isWhite()) 
             {
-                validMoves.add(new int[] { row + 1, col - 1 });
+                validMoves.add(new int[] { row + direction, col - 1 });
             }
-            if (col + 1 < 8 && chessBoard.getBoard()[row + 1][col + 1] != null && !chessBoard.getBoard()[row + 1][col + 1].isWhite()) 
+        
+            // Right diagonal capture (only if there is an opponent's piece)
+            if (col + 1 < 8 && chessBoard.getBoard()[row + direction][col + 1] != null 
+                && chessBoard.getBoard()[row + direction][col + 1].isWhite() != isWhite()) 
             {
-                validMoves.add(new int[] { row + 1, col + 1 });
+                validMoves.add(new int[] { row + direction, col + 1 });
             }
         }
     
@@ -75,6 +90,7 @@ public class Pawn extends Piece
                 }
 
                 return true;  // Move was successfully made
+                
             }
         }
 
@@ -85,6 +101,9 @@ public class Pawn extends Piece
     private void promote(int endX, int endY, ChessBoard board)
     {
         board.getBoard()[endX][endY] = new Queen(isWhite());
+        
+        // Update the visual representation of the piece
+        
         
         System.out.println("Pawn promoted to Queen!");
     }
@@ -98,8 +117,10 @@ public class Pawn extends Piece
     @Override
     public String toString()
     {
-        return isWhite() ? "P" : "p";  // White Pawn is 'P', Black Pawn is 'p'
+        return (isWhite() ? "White Pawn" : "Black Pawn") 
+                + " (Value: " + value + ", First Move: " + isFirstMove + ")";
     }
+
 
     public boolean isFirstMove()
     {
