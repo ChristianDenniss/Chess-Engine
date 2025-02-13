@@ -3,13 +3,13 @@ import java.util.List;
 public class ChessBoard
 {
     private Piece[][] board;
-    private ChessBoardUI chessBoardUI;
 
     public ChessBoard()
     {
         this.board = new Piece[8][8];
-        this.chessBoardUI = chessBoardUI;
+        
         setupBoard();
+        
     }
 
     private void setupBoard()
