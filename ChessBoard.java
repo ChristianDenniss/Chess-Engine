@@ -45,7 +45,55 @@ public class ChessBoard
             }
         }
     }
+    
+    public boolean isKingInCheck(boolean isWhite)
+    {
+        int kingX = -1, kingY = -1;
+        
+        // Find the king's position
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                Piece piece = board[row][col];
+                if (piece instanceof King && piece.isWhite() == isWhite)
+                {
+                    kingX = row;
+                    kingY = col;
+                    break;
+                }
+            }
+        }
+    
+        // Ensure the king was found
+        if (kingX == -1 || kingY == -1)
+        {
+            return false; // Should never happen in a valid game
+        }
+    
+        // Check if any enemy piece can attack the king
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                Piece piece = board[row][col];
+                if (piece != null && piece.isWhite() != isWhite)
+                {
+                    List<int[]> opponentMoves = piece.getValidMoves(row, col, this);
+                    for (int[] move : opponentMoves)
+                    {
+                        if (move[0] == kingX && move[1] == kingY)
+                        {
+                            return true; // King is under attack
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
+    
     // Method to print the board, instead of using toString 
     public void printBoard()
     {
