@@ -1,0 +1,28 @@
+public class Player
+{
+    private String name;
+    private boolean isWhite;
+    private int score;
+
+    public Player(String name, boolean isWhite)
+    {
+        this.name = name;
+        this.isWhite = isWhite;
+        this.score = 0;
+    }
+
+    public boolean isWhite()
+    {
+        return isWhite;
+    }
+    
+    public int getScore()
+    {
+        return score;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+}
