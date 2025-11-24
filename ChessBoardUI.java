@@ -17,6 +17,7 @@ public class ChessBoardUI
     private GridPane grid;
     private ChessBoard chessBoard;
     private Piece[][] board;
+    private Player user;
 
     private Piece selectedPiece = null;  // To track the selected piece
     private int selectedRow = -1;  // Row of the selected piece
@@ -25,7 +26,8 @@ public class ChessBoardUI
     // Add the selected position tracking variables
     private int selectedPieceX = -1;  // Row of the selected piece
     private int selectedPieceY = -1;  // Column of the selected piece
-
+    private boolean isWhiteTurn;
+    private ChessAI testAi;
     // To store the legal move highlights
     private List<Rectangle> legalMoveHighlights = new ArrayList<>();
 
@@ -33,19 +35,23 @@ public class ChessBoardUI
     private Scene scene;
 
     // Constructor to set up the UI elements
-    public ChessBoardUI()
+    public ChessBoardUI(Player user)
     {
         grid = new GridPane();
         chessBoard = new ChessBoard();
         board = chessBoard.getBoard();
         setupBoard();
-
+        this.user = user;
+        this.isWhiteTurn = true;
+        this.testAi = new ChessAI(chessBoard, false);
         // Create the scene and set it
         scene = new Scene(grid, 8 * TILE_SIZE, 8 * TILE_SIZE);
     }
-
+    
+    
+    
     // Method to set up the board with pieces and tiles
-    private void setupBoard()
+    public void setupBoard()
     {
         for (int row = 0; row < 8; row++)
         {
@@ -86,134 +92,131 @@ public class ChessBoardUI
             }
         }
     }
+    
+    public void promotePawn(int x, int y)
+    {
+        Piece piece = this.chessBoard.getBoard()[x][y];
+
+        if (piece instanceof Pawn)
+        {
+            boolean isWhite = piece.isWhite();
+            this.chessBoard.getBoard()[x][y] = new Queen(isWhite); // Replace pawn with queen
+            
+            System.out.println("Pawn promoted to Queen!");
+            refreshBoardUI();
+        }
+    }
 
     private void handleSquareClick(int row, int col)
     {
-        // Debugging: Log the clicked square
         System.out.println("Square clicked: Row = " + row + ", Column = " + col);
-    
-        // Reset the colors of all tiles first
         resetTileColors();
     
-        // Get the piece at the clicked position
         Piece piece = board[row][col];
         System.out.println("Piece at clicked square: " + (piece != null ? piece.toString() : "None"));
     
-        // If there's a piece on the square, handle it
-        if (piece != null)
+        if (selectedPiece == null) // Selecting a piece
         {
-            // If a piece is already selected
-            if (selectedPiece != null)
+            if (piece != null) 
             {
-                // If you clicked the same piece, deselect it
-                if (selectedPiece == piece)
+                if (piece.isWhite() != isWhiteTurn) 
                 {
-                    System.out.println("Deselected the piece: " + selectedPiece.toString());
-                    selectedPiece = null;
-                    resetTileColors();  // Reset tile colors after deselecting
+                    System.out.println("It's not your turn!");
+                    SoundHandler.playErrorSound();
+                    return;
                 }
-                // If the clicked piece is of the same color, switch to the new piece
-                else if (selectedPiece.isWhite() == piece.isWhite())
-                {
-                    System.out.println("Switched to a new piece: " + piece.toString());
-                    selectedPiece = piece;  // Switch to the newly clicked piece
-                    selectedPieceX = row;
-                    selectedPieceY = col;
-                    clearLegalMoveHighlights();  // Clear the old legal move highlights
-                    highlightLegalMoves(piece, row, col);  // Highlight the legal moves of the new piece
-                }
-                // If the clicked piece is of the opposite color, capture the opponent's piece
-                else
-                {
-                    System.out.println("Captured opponent's piece: " + piece.toString());
-                    // Move the selected piece to the target square (capture the opponent's piece)
-                    if (selectedPiece.move(selectedPieceX, selectedPieceY, row, col, chessBoard))
-                    {
-                        board[row][col] = selectedPiece;
-                        board[selectedPieceX][selectedPieceY] = null;  // Clear the original square
     
-                        // Update the UI after the move
-                        refreshBoardUI();
-    
-                        // Deselect the piece after capturing
-                        selectedPiece = null;
-                        resetTileColors();  // Reset all tile colors after the move
-                    }
-                    else
-                    {
-                        System.out.println("Invalid move.");
-                        selectedPiece = null;  // Reset selection if the move is invalid
-                        resetTileColors();  // Reset tile colors
-                        clearLegalMoveHighlights();  // Clear the old legal move highlights
-                    }
-                }
-            }
-            else
-            {
-                // No piece selected, select the new piece and highlight it
                 selectedPiece = piece;
                 selectedPieceX = row;
                 selectedPieceY = col;
-                highlightSelectedTile(row, col);  // Highlight the newly selected tile
-                highlightLegalMoves(piece, row, col);  // Highlight the legal moves of the selected piece
-            }
-        }
-        else
-        {
-            // If the square is empty and a piece is selected, move the selected piece
-            if (selectedPiece != null)
-            {
-                System.out.println("Moving piece to square.");
-    
-                // Get the piece at the target square (where we want to move)
-                Piece targetPiece = board[row][col];
-    
-                // If the target square is empty or has an opponent's piece, proceed
-                if (targetPiece == null || (targetPiece != null && targetPiece.isWhite() != selectedPiece.isWhite()))
-                {
-                    if (selectedPiece.move(selectedPieceX, selectedPieceY, row, col, chessBoard))
-                    {
-                        // Move the selected piece to the target square
-                        board[row][col] = selectedPiece;  // Place the selected piece on the target square
-                        board[selectedPieceX][selectedPieceY] = null;  // Clear the original square
-    
-                        // If there's an opponent's piece on the target square, remove it (capture)
-                        if (targetPiece != null)
-                        {
-                            System.out.println("Captured opponent's piece: " + targetPiece.toString());
-                        }
-    
-                        // Update the UI after the move
-                        refreshBoardUI();
-    
-                        // Deselect the piece after moving
-                        selectedPiece = null;
-                        resetTileColors();  // Reset all tile colors after the move
-                        clearLegalMoveHighlights();  // Clear the legal move highlights
-                    }
-                    else
-                    {
-                        System.out.println("Invalid move.");
-                        selectedPiece = null;  // Reset selection if the move is invalid
-                        resetTileColors();  // Reset tile colors
-                        clearLegalMoveHighlights();  // Clear the old legal move highlights
-                    }
-                }
-                else
-                {
-                    System.out.println("Invalid move, target square occupied by friendly piece.");
-                    selectedPiece = null;  // Reset selection if the move is invalid
-                    resetTileColors();  // Reset tile colors
-                    clearLegalMoveHighlights();  // Clear the old legal move highlights
-                }
+                highlightSelectedTile(row, col);
+                highlightLegalMoves(piece, row, col);
+                System.out.println("Selected piece: " + piece.toString());
             }
             else
             {
-                // If the square is empty and no piece is selected, do nothing
-                System.out.println("No piece selected and square is empty.");
+                System.out.println("Clicked an empty square with no selected piece.");
+            }
+        }
+        else // A piece is already selected, attempt a move
+        {
+            if (piece != null && piece.isWhite() == selectedPiece.isWhite()) 
+            {
+                // Clicking a friendly piece should switch selection, not move
+                System.out.println("Switched to a new piece: " + piece.toString());
+                selectedPiece = piece;
+                selectedPieceX = row;
+                selectedPieceY = col;
+                clearLegalMoveHighlights();
+                highlightLegalMoves(piece, row, col);
+                highlightSelectedTile(row, col);
+            }
+            else
+            {
+                // Move or capture attempt
+                Piece targetPiece = board[row][col];
+                System.out.println("Attempting move to: Row = " + row + ", Column = " + col);
+    
+                if (selectedPiece.move(selectedPieceX, selectedPieceY, row, col, chessBoard)) 
+                {
+                    System.out.println("Move valid, updating board...");
+    
+                    if (targetPiece != null)
+                    {
+                        System.out.println("Captured opponent's piece: " + targetPiece.toString());
+                    }
+    
+                    board[row][col] = selectedPiece;
+                    board[selectedPieceX][selectedPieceY] = null;
+    
+                    if (selectedPiece instanceof Pawn && ((row == 0 && !selectedPiece.isWhite()) || (row == 7 && selectedPiece.isWhite())))
+                    {
+                        promotePawn(row, col);
+                    }
+    
+                    refreshBoardUI();
+                    SoundHandler.playMoveSound();
+                    selectedPiece = null;
+                    resetTileColors();
+                    clearLegalMoveHighlights();
+    
+                    // **Switch turns after a valid move**
+                    isWhiteTurn = !isWhiteTurn;
+                    System.out.println("Turn changed: " + (isWhiteTurn ? "White's turn" : "Black's turn"));
+                    
+                    isWhiteTurn = promptAi(isWhiteTurn);
+                    
+                }
+                else
+                {
+                    System.out.println("Invalid move.");
+                    SoundHandler.playErrorSound();
+                }
             }
         }
     }
+
+    // Method to prompt the AI for a move if it is its turn
+    private boolean promptAi(boolean isWhiteTurn)
+    {
+        // If it's the AI's turn, make a move
+        if (!isWhiteTurn && testAi != null)
+        {
+            // AI makes its move
+            testAi.makeMove();
+            
+            // After AI makes its move, refresh the board UI
+            refreshBoardUI();
+            
+            // Switch the turn to the next player, and return the updated turn status
+            return !isWhiteTurn; 
+            
+
+        }
+        
+        return isWhiteTurn;
+    }
+
 
 
     // Method to highlight the legal moves of the selected piece
@@ -293,7 +296,12 @@ public class ChessBoardUI
             }
         }
     }
-
+    
+    public ChessBoard getChessBoard()
+    {
+        return chessBoard;
+    }
+    
     // Method to get the scene
     public Scene getScene()
     {

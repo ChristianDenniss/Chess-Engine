@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=Move
+comment1.params=startX\ startY\ endX\ endY\ piece
+comment1.target=Move(int,\ int,\ int,\ int,\ Piece)
+comment2.params=
+comment2.target=int\ getStartX()
+comment3.params=
+comment3.target=int\ getStartY()
+comment4.params=
+comment4.target=int\ getEndColumn()
+comment5.params=
+comment5.target=int\ getEndRow()
+comment6.params=
+comment6.target=Piece\ getPiece()
+comment7.params=
+comment7.target=java.lang.String\ toString()
+numComments=8

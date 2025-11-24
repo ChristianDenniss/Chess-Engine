@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Player
+comment1.params=name\ isWhite\ isAI
+comment1.target=Player(java.lang.String,\ boolean,\ boolean)
+comment2.params=
+comment2.target=java.lang.String\ getName()
+comment3.params=
+comment3.target=boolean\ isWhite()
+comment4.params=
+comment4.target=int\ getScore()
+comment5.params=
+comment5.target=boolean\ isAI()
+numComments=6

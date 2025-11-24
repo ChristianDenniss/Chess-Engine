@@ -1,0 +1,19 @@
+#BlueJ class context
+comment0.target=ChessAI
+comment1.params=board\ isWhite
+comment1.target=ChessAI(ChessBoard,\ boolean)
+comment2.params=simulatedBoard
+comment2.target=int\ evaluateBoard(ChessBoard)
+comment3.params=piece\ row\ col
+comment3.target=int\ getPieceSquareBonus(Piece,\ int,\ int)
+comment4.params=moves
+comment4.target=void\ orderMoves(java.util.List)
+comment5.params=move
+comment5.target=int\ getMoveScore(Move)
+comment6.params=simulatedBoard\ depth\ isMaximizingPlayer\ alpha\ beta
+comment6.target=int\ minimax(ChessBoard,\ int,\ boolean,\ int,\ int)
+comment7.params=
+comment7.target=Move\ getBestMove()
+comment8.params=
+comment8.target=void\ makeMove()
+numComments=9

@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=SoundHandler
+comment1.params=
+comment1.target=void\ playMoveSound()
+comment2.params=
+comment2.target=void\ playErrorSound()
+comment3.params=
+comment3.target=void\ playCaptureSound()
+comment4.params=filePath
+comment4.target=void\ playSound(java.lang.String)
+numComments=5

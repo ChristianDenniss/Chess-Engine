@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=Pawn
+comment1.params=isWhite
+comment1.target=Pawn(boolean)
+comment2.params=row\ col\ chessBoard
+comment2.target=getValidMoves(int,\ int,\ ChessBoard)
+comment3.params=startX\ startY\ endX\ endY\ board
+comment3.target=boolean\ move(int,\ int,\ int,\ int,\ ChessBoard)
+comment4.params=endX\ endY\ board
+comment4.target=void\ promote(int,\ int,\ ChessBoard)
+comment5.params=
+comment5.target=java.lang.String\ getImageFileName()
+comment6.params=
+comment6.target=java.lang.String\ toString()
+comment7.params=
+comment7.target=boolean\ isFirstMove()
+numComments=8

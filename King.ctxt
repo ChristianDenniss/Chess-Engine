@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=King
+comment1.params=isWhite
+comment1.target=King(boolean)
+comment2.params=startX\ startY\ board
+comment2.target=getValidMoves(int,\ int,\ ChessBoard)
+comment3.params=startX\ startY\ endX\ endY\ board
+comment3.target=boolean\ move(int,\ int,\ int,\ int,\ ChessBoard)
+comment4.params=
+comment4.target=java.lang.String\ toString()
+comment5.params=
+comment5.target=java.lang.String\ getImageFileName()
+numComments=6

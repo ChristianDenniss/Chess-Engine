@@ -1,0 +1,27 @@
+#BlueJ class context
+comment0.target=ChessBoardUI
+comment1.params=user
+comment1.target=ChessBoardUI(Player)
+comment10.params=row\ col
+comment10.target=void\ highlightSelectedTile(int,\ int)
+comment11.params=
+comment11.target=ChessBoard\ getChessBoard()
+comment12.params=
+comment12.target=javafx.scene.Scene\ getScene()
+comment2.params=
+comment2.target=void\ setupBoard()
+comment3.params=x\ y
+comment3.target=void\ promotePawn(int,\ int)
+comment4.params=row\ col
+comment4.target=void\ handleSquareClick(int,\ int)
+comment5.params=isWhiteTurn
+comment5.target=boolean\ promptAi(boolean)
+comment6.params=piece\ row\ col
+comment6.target=void\ highlightLegalMoves(Piece,\ int,\ int)
+comment7.params=
+comment7.target=void\ clearLegalMoveHighlights()
+comment8.params=
+comment8.target=void\ resetTileColors()
+comment9.params=
+comment9.target=void\ refreshBoardUI()
+numComments=13

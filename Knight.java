@@ -36,7 +36,7 @@ public class Knight extends Piece
                 }
             }
         }
-
+        
         return validMoves;
     }
 

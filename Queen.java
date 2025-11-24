@@ -80,7 +80,10 @@ public class Queen extends Piece
                 // Move is valid, update the board
                 board.getBoard()[endX][endY] = this;
                 board.getBoard()[startX][startY] = null;
+                
+                
                 return true;
+                
             }
         }
     
